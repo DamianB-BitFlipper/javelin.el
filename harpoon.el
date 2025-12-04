@@ -482,7 +482,7 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
 
 ;;;###autoload
 (defun harpoon-clear ()
-  "Clear harpoon files."
+  "Clear all harpoon positions."
   (interactive)
   (when (yes-or-no-p "Do you really want to clear harpoon all harpoon positions? ")
     (harpoon--write-harpoon-positions '())
@@ -490,7 +490,7 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
 
 ;;;###autoload
 (defun harpoon-clear-all ()
-  "Delete all harpoon JSON cache files."
+  "Delete all harpoon position namespaces."
   (interactive)
   (when (yes-or-no-p "Do you really want to clear all harpoon positions across all harpoon projects? ")
     (let ((files (directory-files harpoon-cache-dir t "\\.json$")))
