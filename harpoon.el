@@ -46,6 +46,13 @@
 (defcustom harpoon-separate-by-branch t
   "Harpoon separated by branch."
   :type 'boolean)
+
+(defcustom harpoon-default-positions-namespace "harpoon"
+  "Namespace for harpoon positions when not in a project.
+Used as a fallback identifier for the cache file when harpoon cannot
+detect a project root. The namespace helps isolate harpoon positions
+for different contexts."
+  :type 'string)
 ;;; --- Customizable variables ---
 
 (defvar harpoon-project-provider (if (featurep 'projectile) 'projectile 'project)
@@ -97,10 +104,10 @@ Returns nil if not in a git repository."
 
 (defun harpoon--cache-key ()
   "Key to save current file on cache.
-Returns nil if there is no project."
+Returns `harpoon-default-positions-namespace' if there is no project."
   ;; Use `url-hexify-string' to percent-encode the cache key, making it
   ;; filename-friendly by escaping "/" and other forbidden characters.
-  (when-let ((project-name (harpoon--get-project-name)))
+  (let ((project-name (or (harpoon--get-project-name) harpoon-default-positions-namespace)))
     (url-hexify-string
      (if-let ((branch (and harpoon-separate-by-branch (harpoon--get-branch-name))))
          (concat project-name "#" branch)
@@ -477,19 +484,19 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
 (defun harpoon-clear ()
   "Clear harpoon files."
   (interactive)
-  (when (yes-or-no-p "Do you really want to clear harpoon file? ")
+  (when (yes-or-no-p "Do you really want to clear harpoon all harpoon positions? ")
     (harpoon--write-harpoon-positions '())
-    (message "Harpoon cleaned.")))
+    (message "Harpoon positions cleaned.")))
 
 ;;;###autoload
 (defun harpoon-clear-all ()
   "Delete all harpoon JSON cache files."
   (interactive)
-  (when (yes-or-no-p "Do you really want to delete ALL harpoon positions? ")
+  (when (yes-or-no-p "Do you really want to clear all harpoon positions across all harpoon projects? ")
     (let ((files (directory-files harpoon-cache-dir t "\\.json$")))
       (dolist (file files)
         (delete-file file))
-      (message "Deleted %d harpoon position namespace(s)." (length files)))))
+      (message "Deleted all harpoon positions across %d project(s)." (length files)))))
 
 (provide 'harpoon)
 ;;; harpoon.el ends here
