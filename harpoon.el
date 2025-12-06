@@ -208,7 +208,7 @@ Returns the relative path if in a project, otherwise the absolute path."
         (file-relative-name (buffer-file-name) project-root)
       (buffer-file-name))))
 
-;;; --- Generic harpoon functions ---
+;;; --- Go-to functions ---
 
 ;;;###autoload
 (defun harpoon-go-to (harpoon-number)
@@ -226,25 +226,6 @@ Returns the relative path if in a project, otherwise the absolute path."
       (find-file full-file-name))
      (t
       (message "%s not found." full-file-name)))))
-
-;;;###autoload
-(defun harpoon-delete (harpoon-number)
-  "Delete an item on harpoon. HARPOON-NUMBER: Position to delete."
-  (harpoon--remove-filepath-by-position harpoon-number)
-  (message "Deleted harpoon position %d" harpoon-number))
-
-
-;;;###autoload
-(defun harpoon-assign-to (harpoon-number)
-  "Assign the current buffer to a specific position in harpoon.
-HARPOON-NUMBER: The position (1-9) to assign the current file to."
-  (let ((file-to-add (harpoon--buffer-filepath-relative-to-root)))
-    (harpoon--set-filepath-by-position harpoon-number file-to-add)
-    (message "Assigned %s to harpoon position %d" file-to-add harpoon-number)))
-
-;;; --- Generic harpoon functions ---
-
-;;; --- Go-to functions ---
 
 ;;;###autoload
 (defun harpoon-go-to-1 ()
@@ -305,6 +286,12 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
 ;;; --- Delete functions ---
 
 ;;;###autoload
+(defun harpoon-delete (harpoon-number)
+  "Delete an item on harpoon. HARPOON-NUMBER: Position to delete."
+  (harpoon--remove-filepath-by-position harpoon-number)
+  (message "Deleted harpoon position %d" harpoon-number))
+
+;;;###autoload
 (defun harpoon-delete-1 ()
   "Delete item harpoon on position 1."
   (interactive)
@@ -363,6 +350,14 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
 ;;; --- Assign to functions ---
 
 ;;;###autoload
+(defun harpoon-assign-to (harpoon-number)
+  "Assign the current buffer to a specific position in harpoon.
+HARPOON-NUMBER: The position (1-9) to assign the current file to."
+  (let ((file-to-add (harpoon--buffer-filepath-relative-to-root)))
+    (harpoon--set-filepath-by-position harpoon-number file-to-add)
+    (message "Assigned %s to harpoon position %d" file-to-add harpoon-number)))
+
+;;;###autoload
 (defun harpoon-assign-to-1 ()
   "Assign current buffer to position 1 on harpoon."
   (interactive)
@@ -417,6 +412,72 @@ HARPOON-NUMBER: The position (1-9) to assign the current file to."
   (harpoon-assign-to 9))
 
 ;;; --- Assign to functions ---
+
+;;;###autoload
+(defun harpoon-go-or-assign-to (harpoon-number)
+  "Go to harpoon position if occupied, otherwise assign current buffer to it.
+HARPOON-NUMBER: The position (1-9) to go to or assign."
+  (if (harpoon--get-filepath-by-position harpoon-number)
+      (harpoon-go-to harpoon-number)
+    (harpoon-assign-to harpoon-number)))
+
+;;; --- Go or assign to functions ---
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-1 ()
+  "Go to position 1 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 1))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-2 ()
+  "Go to position 2 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 2))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-3 ()
+  "Go to position 3 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 3))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-4 ()
+  "Go to position 4 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 4))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-5 ()
+  "Go to position 5 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 5))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-6 ()
+  "Go to position 6 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 6))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-7 ()
+  "Go to position 7 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 7))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-8 ()
+  "Go to position 8 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 8))
+
+;;;###autoload
+(defun harpoon-go-or-assign-to-9 ()
+  "Go to position 9 if occupied, otherwise assign current buffer to it."
+  (interactive)
+  (harpoon-go-or-assign-to 9))
+
+;;; --- Go or assign to functions ---
 
 ;;;###autoload
 (defun harpoon-go-to-next ()
