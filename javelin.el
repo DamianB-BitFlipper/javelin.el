@@ -202,30 +202,35 @@ Returns nil if all positions 1-9 are taken."
 
 (defun javelin--buffer-filepath-relative-to-root ()
   "Get buffer file name relative to project root.
-Returns the relative path if in a project, otherwise the absolute path."
-  (let ((project-root (javelin--get-project-root)))
-    (if project-root
-        (file-relative-name (buffer-file-name) project-root)
-      (buffer-file-name))))
+Returns the relative path if in a project, otherwise the absolute path.
+For non-file buffers, returns the buffer name."
+  (if-let ((filepath (buffer-file-name)))
+      (let ((project-root (javelin--get-project-root)))
+        (if project-root
+            (file-relative-name filepath project-root)
+          filepath))
+    (buffer-name)))
 
 ;;; --- Go-to functions ---
 
 ;;;###autoload
 (defun javelin-go-to (javelin-number)
-  "Go to specific file on javelin by JAVELIN-NUMBER."
-  (let* ((file-name (javelin--get-filepath-by-position javelin-number))
+  "Go to specific file or buffer on javelin by JAVELIN-NUMBER."
+  (let* ((name (javelin--get-filepath-by-position javelin-number))
          (project-root (javelin--get-project-root))
-         (full-file-name (when file-name
+         (full-file-name (when name
                            (if project-root
-                               (concat project-root file-name)
-                             file-name))))
+                               (concat project-root name)
+                             name))))
     (cond
-     ((null file-name)
+     ((null name)
       (message "No file javelined to position %d" javelin-number))
      ((file-exists-p full-file-name)
       (find-file full-file-name))
+     ((get-buffer name)
+      (switch-to-buffer name))
      (t
-      (message "%s not found." full-file-name)))))
+      (message "%s not found." name)))))
 
 ;;;###autoload
 (defun javelin-go-to-1 ()
