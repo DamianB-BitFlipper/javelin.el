@@ -1,4 +1,4 @@
-;;; javelin.el --- Bookmarks on steroids    -*- lexical-binding: t; -*-
+;;; javelin.el --- Implementation of harpoon: bookmarks on steroids -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2025 Damian Barabonkov
 ;; Based on harpoon.el, Copyright (C) 2022 Otávio Schwanck
@@ -6,7 +6,7 @@
 ;; Author: Damian Barabonkov
 ;; Keywords: tools languages
 ;; Homepage: https://github.com/DamianB-BitFlipper/javelin.el
-;; Version: 0.1.0
+;; Version: 0.1.1
 ;; Package-Requires: ((emacs "28.1") (f "0.20.0"))
 
 ;; This program is free software; you can redistribute it and/or modify
