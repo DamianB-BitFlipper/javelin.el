@@ -7,7 +7,7 @@
 ;; Keywords: tools languages
 ;; Homepage: https://github.com/DamianB-BitFlipper/javelin.el
 ;; Version: 0.1.1
-;; Package-Requires: ((emacs "28.1") (f "0.20.0"))
+;; Package-Requires: ((emacs "28.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,7 +31,6 @@
 ;; positions are namespaced by project and branch if within a git repository. Otherwise,
 ;; just by project if not within git. Globally namespaced otherwise.
 
-(require 'f)
 (require 'subr-x)
 (require 'cl-lib)
 (require 'project)
@@ -130,10 +129,10 @@ Returns `javelin-default-positions-namespace' if there is no project."
 
 (defun javelin--ensure-cache-file ()
   "Create javelin cache dir and file if they don't exist."
-  (unless (f-directory? javelin-cache-dir)
+  (unless (file-directory-p javelin-cache-dir)
     (make-directory javelin-cache-dir t))
   (unless (file-exists-p (javelin--cache-file-name))
-    (f-write-text (json-serialize '()) 'utf-8 (javelin--cache-file-name))))
+    (write-region (json-serialize '()) nil (javelin--cache-file-name))))
 
 (defun javelin--sort-positions (data)
   "Sort DATA by `javelin_position' in increasing order."
@@ -147,9 +146,11 @@ Returns `javelin-default-positions-namespace' if there is no project."
 Returns a list of alists with `javelin_position' and `filepath' keys."
   (let ((data (if (file-exists-p (javelin--cache-file-name))
                   (condition-case nil
-                      (json-parse-string (f-read (javelin--cache-file-name) 'utf-8)
-                                         :object-type 'alist
-                                         :array-type 'list)
+		      (with-temp-buffer
+			(insert-file-contents (javelin--cache-file-name))
+			(goto-char (point-min))
+			(json-parse-buffer :object-type 'alist
+                                           :array-type 'list))
                     ;; JSON file got corrupted, delete it and return empty list
                     (error
                      (delete-file (javelin--cache-file-name))
@@ -167,7 +168,7 @@ If DATA is empty, deletes the cache file instead."
       (when (file-exists-p (javelin--cache-file-name))
         (delete-file (javelin--cache-file-name)))
     (javelin--ensure-cache-file)
-    (f-write-text (json-serialize (vconcat (javelin--sort-positions data))) 'utf-8 (javelin--cache-file-name))))
+    (write-region (json-serialize (vconcat (javelin--sort-positions data))) nil (javelin--cache-file-name))))
 
 (defun javelin--get-filepath-by-position (javelin-position)
   "Get the filepath for a given JAVELIN-POSITION.
@@ -571,7 +572,7 @@ With prefix arg \\[universal-argument], always assign even if position is occupi
 (defun javelin-clear ()
   "Clear all javelin positions."
   (interactive)
-  (when (yes-or-no-p "Do you really want to clear javelin all javelin positions? ")
+  (when (yes-or-no-p "Do you really want to clear javelin all javelin positions?")
     (javelin--write-javelin-positions '())
     (message "Javelin positions cleaned.")))
 
