@@ -37,8 +37,6 @@
 
 ;; Since these are optional, simply declare the external functions
 ;; that may or may not be available
-(declare-function projectile-project-root "projectile")
-(declare-function projectile-project-name "projectile")
 (declare-function magit-get-current-branch "magit")
 
 ;;; Code:
@@ -63,13 +61,11 @@ Used as a fallback identifier for the cache file when javelin cannot
 detect a project root. The namespace helps isolate javelin positions
 for different contexts."
   :type 'string)
+
+(defcustom javelin-disable-confirmation nil
+  "If non-nil, skip confirmation prompts for destructive actions."
+  :type 'boolean)
 ;;; --- Customizable variables ---
-
-(defvar javelin-project-provider (if (featurep 'projectile) 'projectile 'project)
-  "Project provider to use for getting project root.
-Can be `projectile' or `project'.")
-
-
 
 (defvar javelin--markers (make-hash-table :test 'equal)
   "Hash table mapping (filepath . javelin-position) to markers.
@@ -84,27 +80,21 @@ Cache files with a different version will be deleted and recreated.")
 (defun javelin--get-project-root ()
   "Get the project root.
 Returns the project root path as a string, or nil if there is no project."
-  (cond
-   ((eq javelin-project-provider 'projectile) (projectile-project-root))
-   ((eq javelin-project-provider 'project)
-    (when-let ((proj (project-current)))
-      (expand-file-name (project-root proj))))))
+  (when-let ((proj (project-current)))
+    (expand-file-name (project-root proj))))
 
 (defun javelin--get-project-name ()
   "Get the javelin project name.
 Returns the project name as a string, or nil if there is no project."
   (when (javelin--get-project-root)
-    (cond
-     ((eq javelin-project-provider 'projectile) (projectile-project-name))
-     ;; The `project' package has no built-in way to get the project name.
-     ;; Extract it by splitting the project root path by "/" and taking
-     ;; the second-to-last element (the directory name before the trailing slash).
-     ;; e.g., "/home/user/projects/myproject/" -> "myproject"
-     ((eq javelin-project-provider 'project)
-      (let* ((project-path (javelin--get-project-root))
-             (path-parts (split-string project-path "/"))
-             (name-index (- (length path-parts) 2)))
-        (nth name-index path-parts))))))
+    ;; The `project' package has no built-in way to get the project name.
+    ;; Extract it by splitting the project root path by "/" and taking
+    ;; the second-to-last element (the directory name before the trailing slash).
+    ;; e.g., "/home/user/projects/myproject/" -> "myproject"
+    (let* ((project-path (javelin--get-project-root))
+           (path-parts (split-string project-path "/"))
+           (name-index (- (length path-parts) 2)))
+      (nth name-index path-parts))))
 
 (defun javelin--get-branch-name ()
   "Get the branch name for javelin.
@@ -647,7 +637,8 @@ Also records the current point position for later navigation."
 (defun javelin-clear ()
   "Clear all javelin positions."
   (interactive)
-  (when (yes-or-no-p "Do you really want to clear all javelin positions?")
+  (when (or javelin-disable-confirmation
+            (yes-or-no-p "Do you really want to clear all javelin positions?"))
     (javelin--write-javelin-positions '())
     (message "Javelin positions cleaned.")))
 
@@ -655,7 +646,8 @@ Also records the current point position for later navigation."
 (defun javelin-clear-all ()
   "Delete all javelin position namespaces."
   (interactive)
-  (when (yes-or-no-p "Do you really want to clear all javelin positions across all javelin projects? ")
+  (when (or javelin-disable-confirmation
+            (yes-or-no-p "Do you really want to clear all javelin positions across all javelin projects? "))
     (let ((files (directory-files javelin-cache-dir t "\\.json$")))
       (dolist (file files)
         (delete-file file))
