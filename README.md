@@ -22,6 +22,8 @@ In `packages.el`:
 In `config.el`:
 ```elisp
 (use-package! javelin
+  :custom
+  (javelin-update-bookmark t)
   :config
   (global-javelin-minor-mode 1))
 ```
@@ -31,6 +33,8 @@ In `config.el`:
 ```elisp
 (use-package javelin
   :ensure t
+  :custom
+  (javelin-update-bookmark t)
   :config
   (global-javelin-minor-mode 1))
 ```
@@ -43,6 +47,12 @@ In `config.el`:
 | `C-u M-1` ... | Assign current buffer to position |
 | `M-0 1` to `M-0 9` | Delete position |
 | `M--` | Quick menu to select from all javelined buffers |
+
+## Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `javelin-update-bookmark` | When non-nil, automatically update cursor position when jumping between javelin positions. Default is `nil`. |
 
 ## Key Features
 
