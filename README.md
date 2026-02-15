@@ -22,8 +22,6 @@ In `packages.el`:
 In `config.el`:
 ```elisp
 (use-package! javelin
-  :custom
-  (javelin-update-bookmark t)
   :config
   (global-javelin-minor-mode 1))
 ```
@@ -33,8 +31,6 @@ In `config.el`:
 ```elisp
 (use-package javelin
   :ensure t
-  :custom
-  (javelin-update-bookmark t)
   :config
   (global-javelin-minor-mode 1))
 ```
@@ -52,7 +48,7 @@ In `config.el`:
 
 | Variable | Description |
 |----------|-------------|
-| `javelin-update-bookmark` | When non-nil, automatically update cursor position when jumping between javelin positions. Default is `nil`. |
+| `javelin-update-bookmark` | When non-nil, save point before jumping so returning restores your last position, not the original pin location. Default: `nil`. |
 
 ## Key Features
 
