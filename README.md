@@ -44,6 +44,12 @@ In `config.el`:
 | `M-0 1` to `M-0 9` | Delete position |
 | `M--` | Quick menu to select from all javelined buffers |
 
+## Configuration
+
+| Variable | Description |
+|----------|-------------|
+| `javelin-update-bookmark` | When non-nil, save point before jumping so returning restores your last position, not the original pin location. Default: `nil`. |
+
 ## Key Features
 
 - Jump to any pinned buffer with a single keystroke (M-1 through M-9)

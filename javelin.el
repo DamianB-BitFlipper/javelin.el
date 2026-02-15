@@ -59,6 +59,10 @@ The namespace helps isolate javelin positions for different contexts."
 (defcustom javelin-disable-confirmation nil
   "If non-nil, skip confirmation prompts for destructive actions."
   :type 'boolean)
+
+(defcustom javelin-update-bookmark nil
+  "When non-nil, automatically save cursor position when switching javelins."
+  :type 'boolean)
 ;;; --- Customizable variables ---
 
 (defconst javelin--bookmark-prefix "javelin:"
@@ -83,7 +87,7 @@ The namespace helps isolate javelin positions for different contexts."
 (defun javelin--get-project-root ()
   "Get the project root.
 Returns the project root path as a string, or nil if there is no project."
-  (when-let ((proj (project-current)))
+  (when-let* ((proj (project-current)))
     (expand-file-name (project-root proj))))
 
 (defun javelin--get-project-name ()
@@ -107,7 +111,7 @@ Returns nil if not in a git repository."
 (defun javelin--bookmark-namespace ()
   "Namespace for javelin bookmark names."
   (let ((project-name (or (javelin--get-project-name) javelin-default-positions-namespace)))
-    (if-let ((branch (and javelin-separate-by-branch (javelin--get-branch-name))))
+    (if-let* ((branch (and javelin-separate-by-branch (javelin--get-branch-name))))
         (format "%s#%s" project-name branch)
       project-name)))
 
@@ -165,6 +169,11 @@ Returns nil if not in a git repository."
   "Go to specific file or buffer of the javelin by JAVELIN-NUMBER."
   (interactive "nJavelin position: ")
   (javelin--ensure-bookmarks-loaded)
+  ;; Update current buffer's cursor position if enabled
+  (when-let* ((_ javelin-update-bookmark)
+              (current-pos (javelin--position-for-current-buffer)))
+    (bookmark-set (javelin--bookmark-name current-pos))
+    (javelin--bookmark-save-silent))
   (let ((name (javelin--bookmark-name javelin-number)))
     (if (bookmark-get-bookmark name 'noerror)
         (bookmark-jump name)
@@ -498,7 +507,7 @@ DIRECTION should be 1 for next, -1 for previous."
                          (complete-with-action action candidate-strings string pred)))))
     (if (null candidates)
         (message "No javelin positions set.")
-      (when-let ((selection (completing-read "Javelin to file: " collection)))
+      (when-let* ((selection (completing-read "Javelin to file: " collection)))
         (let ((pos (cdr (assoc selection candidates))))
           (javelin-go-to pos))))))
 
